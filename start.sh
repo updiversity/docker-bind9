@@ -40,8 +40,10 @@ zone "${BIND9_ROOTDOMAIN}" {
        allow-update { key "${BIND9_KEYNAME}"; } ;
 };
 EOF
-  echo "Creating ${BIND9_ROOTDOMAIN} configuration"
-  cat <<EOF >> "/etc/bind/zones/db.${BIND9_ROOTDOMAIN}" 
+
+  if [[ ! -f /etc/bind/zones/db.${BIND9_ROOTDOMAIN} ]]; then
+    echo "Creating ${BIND9_ROOTDOMAIN} configuration"
+    cat <<EOF >> "/etc/bind/zones/db.${BIND9_ROOTDOMAIN}"
 @		IN SOA	ns.${BIND9_ROOTDOMAIN}. root.${BIND9_ROOTDOMAIN}. (
 				20041125   ; serial
 				604800     ; refresh (1 week)
@@ -53,6 +55,8 @@ EOF
 ns			A	${BIND9_IP}
 ${BIND9_STATIC_ENTRIES}
 EOF
+  fi
+
   echo "Creating named.conf.options configuration"
   if [[ -z "${BIND9_FORWARDERS}" ]];then
     forwarders=""
